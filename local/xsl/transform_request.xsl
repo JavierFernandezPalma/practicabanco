@@ -52,7 +52,7 @@
         <xsl:variable name="username" select="dp:variable('var://context/transaction/wsseUsername')"/>
         <xsl:variable name="password" select="vcsoft:decryptPassword(dp:variable('var://context/transaction/wssePassword'))"/>
         <xsl:variable name="soapMessage">
-            <soap:Envelope xmlns:tem="http://tempuri.org/"
+            <soapenv:Envelope xmlns:tem="http://tempuri.org/"
                            xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
                 <xsl:choose>
                     <xsl:when test="$method='VerificarEstadoWebService'">
@@ -60,35 +60,27 @@
                         <dp:set-http-request-header name="'Content-type'" value="concat('application/soap+xml;charset=UTF-8;action=&quot;http://tempuri.org/IWCFPagoVentanilla/VerificarEstadoWebServiceGen&quot;')"/>
                         <dp:freeze-headers/>
                         <!-- Mapeo del Body para la trama dummy -->
-                        <soap:Header xmlns:wsa="http://www.w3.org/2005/08/addressing">
+                        <soapenv:Header xmlns:wsa="http://www.w3.org/2005/08/addressing">
                             <wsa:Action>http://tempuri.org/IWCFPagoVentanilla/VerificarEstadoWebServiceGen</wsa:Action>
                             <wsa:To>https://172.25.59.4:59511/WCFPagoVentanillaProxySign/WCFPagoVentanilla.svc</wsa:To>
-                        </soap:Header>
-                        <soap:Body>
-                            <xsl:variable name="varIFX">
-                                <IFX>
-                                    <SignonRq>
-                                        <ClientDt>
-                                            <xsl:value-of select="$clientDt"/>
-                                        </ClientDt>
-                                        <CustLangPref>es-CO</CustLangPref>
-                                        <ClientApp>
-                                            <Org>Bancolombia</Org>
-                                            <Name>App</Name>
-                                            <Version>1.0</Version>
-                                        </ClientApp>
-                                    </SignonRq>
-                                </IFX>
-                            </xsl:variable>
-                            <tem:VerificarEstadoWebServiceGen>
+                        </soapenv:Header>
+                        <soapenv:Body>
+                            <jav:dummy>
                                 <!--Optional:-->
-                                <tem:infoDummy>
-                                    <dp:serialize select="$varIFX" omit-xml-decl="yes"/> 
-                                </tem:infoDummy>
-                                <!--Optional:-->
-                                <tem:codigoBanco>7</tem:codigoBanco>
-                            </tem:VerificarEstadoWebServiceGen>
-                        </soap:Body>
+                                <jav:request>
+                                    <!--Optional:-->
+                                    <jav:User>
+                                        <xsl: value-of select = "$username"/>
+                                    </jav:User>
+                                    <!--Optional:-->
+                                    <jav:Password>
+                                        <xsl: value-of select = "$password"/>
+                                    </jav:Password>
+                                </jav:request>
+                            </jav:dummy>
+
+                            
+                        </soapenv:Body>
                     </xsl:when>
                     <xsl:when test="$method='ConsultarFacturaPorNumero'">
                         <!-- Incluir en el atributo value el valor correspondiente para esta operacion -->
@@ -104,11 +96,34 @@
                         <xsl:variable name="version" select="$srtIFX/*[local-name()='IFX']/*[local-name()='SignonRq']/*[local-name()='ClientApp']/*[local-name()='Version']"/>
                         <xsl:variable name="billInqRqRqUID" select="$srtIFX/*[local-name()='IFX']/*[local-name()='PresSvcRq']/*[local-name()='BillInqRq']/*[local-name()='RqUID']"/>
                         <!-- Mapeo del Body para consultar facturas por numero -->
-                        <soap:Header xmlns:wsa="http://www.w3.org/2005/08/addressing">
+                        <soapenv:Header xmlns:wsa="http://www.w3.org/2005/08/addressing">
                             <wsa:Action>http://tempuri.org/IWCFPagoVentanilla/ConsultarCuponesGen</wsa:Action>
                             <wsa:To>https://172.25.59.4:59511/WCFPagoVentanillaProxySign/WCFPagoVentanilla.svc</wsa:To>
-                        </soap:Header>
-                        <soap:Body>
+                        </soapenv:Header>
+                        <soapenv:Body>
+                            <jav:consultaRecaudo>
+                                <!--Optional:-->
+                                <jav:consulta>
+                                    <!--Optional:-->
+                                    <jav:RqUID>?</jav:RqUID>
+                                    <!--Optional:-->
+                                    <jav:SpName>?</jav:SpName>
+                                    <!--Optional:-->
+                                    <jav:Date>?</jav:Date>
+                                    <!--Optional:-->
+                                    <jav:Ref>?</jav:Ref>
+                                    <!--Optional:-->
+                                    <jav:Ean>?</jav:Ean>
+                                    <jav:Value>?</jav:Value>
+                                    <!--Optional:-->
+                                    <jav:User>?</jav:User>
+                                    <!--Optional:-->
+                                    <jav:Password>?</jav:Password>
+                                </jav:consulta>
+                            </jav:consultaRecaudo>
+
+
+
                             <xsl:variable name="varIFX">
                                 <IFX>
                                     <SignonRq>
@@ -171,7 +186,7 @@
                                 <!--Optional:-->
                                 <tem:tipoDocumento>1</tem:tipoDocumento>
                             </tem:ConsultarCuponesGen>
-                        </soap:Body>
+                        </soapenv:Body>
                     </xsl:when>
                     <!-- Si el metodo es ConsultarFacturasPorNegocio se construye mensaje de respuesta -->
                     <xsl:when test="$method='ConsultarFacturasPorNegocio'">
@@ -387,7 +402,7 @@
                         </soap:Body>
                     </xsl:when>
                 </xsl:choose>
-            </soap:Envelope>
+            </soapenv:Envelope>
         </xsl:variable>
         <!-- Log/Request | RIN Standard > Servicio Cliente  -->
         <xsl:call-template name="registerLog">
