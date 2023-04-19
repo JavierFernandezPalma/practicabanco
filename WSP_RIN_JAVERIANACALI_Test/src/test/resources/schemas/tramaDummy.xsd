@@ -1,0 +1,16 @@
+<xsd:schema targetNamespace="http://TramaDummyRIN/" xmlns:Q1="http://TramaDummyRIN/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="envioTramaDummy">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="codigoConvenio" type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="envioTramaDummyResponse" type="Q1:salidaResponse" />
+	<xsd:complexType name="salidaResponse">
+		<xsd:sequence>
+			<xsd:element name="respuesta" type="xsd:string" />
+			<xsd:element name="descripcion" type="xsd:string" />
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

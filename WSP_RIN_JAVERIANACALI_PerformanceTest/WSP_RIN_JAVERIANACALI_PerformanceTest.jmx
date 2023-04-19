@@ -1,0 +1,533 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.4.3">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Plan de Pruebas" enabled="true">
+      <stringProp name="TestPlan.comments"></stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="Variables definidas por el Usuario" enabled="true">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+      <stringProp name="TestPlan.user_define_classpath"></stringProp>
+    </TestPlan>
+    <hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="WSP_RIN_JAVERIANACALI_Test" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Controlador Bucle" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <intProp name="LoopController.loops">-1</intProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${__P(hilos,138)}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${__P(subida,60)}</stringProp>
+        <longProp name="ThreadGroup.start_time">1543957318000</longProp>
+        <longProp name="ThreadGroup.end_time">1543957318000</longProp>
+        <boolProp name="ThreadGroup.scheduler">true</boolProp>
+        <stringProp name="ThreadGroup.duration">${__P(duracion,600)}</stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+        <boolProp name="ThreadGroup.delayedStart">true</boolProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+      </ThreadGroup>
+      <hashTree>
+        <ThroughputController guiclass="ThroughputControllerGui" testclass="ThroughputController" testname="Throughput Controller" enabled="true">
+          <intProp name="ThroughputController.style">1</intProp>
+          <boolProp name="ThroughputController.perThread">false</boolProp>
+          <intProp name="ThroughputController.maxThroughput">1</intProp>
+          <FloatProperty>
+            <name>ThroughputController.percentThroughput</name>
+            <value>32.0</value>
+            <savedValue>0.0</savedValue>
+          </FloatProperty>
+        </ThroughputController>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Tx_Request_success_envioTramaDummy" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:tram=&quot;http://TramaDummyRIN/&quot;&gt;&#xd;
+	&lt;soapenv:Header/&gt;&#xd;
+	&lt;soapenv:Body&gt;&#xd;
+		&lt;tram:envioTramaDummy&gt;&#xd;
+			&lt;codigoConvenio&gt;76309&lt;/codigoConvenio&gt;&#xd;
+		&lt;/tram:envioTramaDummy&gt;&#xd;
+	&lt;/soapenv:Body&gt;&#xd;
+&lt;/soapenv:Envelope&gt;&#xd;
+</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain">172.25.59.5</stringProp>
+            <stringProp name="HTTPSampler.port">59056</stringProp>
+            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
+            <stringProp name="HTTPSampler.path">/WSTramaDummyRIN/servicioTramaDummy</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            <stringProp name="HTTPSampler.proxyPass">${password}</stringProp>
+            <stringProp name="HTTPSampler.implementation">HttpClient4</stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Aserción de Respuesta" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="49586">200</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+              <boolProp name="Assertion.assume_success">true</boolProp>
+              <intProp name="Assertion.test_type">2</intProp>
+              <stringProp name="Assertion.scope">all</stringProp>
+              <stringProp name="Assertion.custom_message"></stringProp>
+            </ResponseAssertion>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <ThroughputController guiclass="ThroughputControllerGui" testclass="ThroughputController" testname="Throughput Controller" enabled="true">
+          <intProp name="ThroughputController.style">1</intProp>
+          <boolProp name="ThroughputController.perThread">false</boolProp>
+          <intProp name="ThroughputController.maxThroughput">1</intProp>
+          <FloatProperty>
+            <name>ThroughputController.percentThroughput</name>
+            <value>32.0</value>
+            <savedValue>0.0</savedValue>
+          </FloatProperty>
+        </ThroughputController>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Tx_Request_success_ConsultarFacturaPorNumero" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;&#xd;
+	&lt;soapenv:Body&gt;&#xd;
+		&lt;ConsultarFacturaPorNumero xmlns=&quot;http://tempuri.org/&quot;&gt;&#xd;
+			&lt;numeroFactura&gt;&#xd;
+				&lt;![CDATA[&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#xd;
+					&lt;IFX&gt;&#xd;
+						&lt;SignonRq&gt;&#xd;
+							&lt;ClientDt&gt;2023-03-03T11:12:13&lt;/ClientDt&gt;&#xd;
+							&lt;CustLangPref&gt;es-CO&lt;/CustLangPref&gt;&#xd;
+							&lt;ClientApp&gt;&#xd;
+								&lt;Org&gt;BANCOLOMBIA&lt;/Org&gt;&#xd;
+								&lt;Name&gt;RIN&lt;/Name&gt;&#xd;
+								&lt;Version&gt;1.0&lt;/Version&gt;&#xd;
+							&lt;/ClientApp&gt;&#xd;
+						&lt;/SignonRq&gt;&#xd;
+						&lt;PresSvcRq&gt;&#xd;
+							&lt;RqUID&gt;00000000-0000-0000-0000-987217210929&lt;/RqUID&gt;&#xd;
+							&lt;BillInqRq&gt;&#xd;
+								&lt;RqUID&gt;00000000-0000-0000-0000-987217210929&lt;/RqUID&gt;&#xd;
+								&lt;SPName&gt;76309&lt;/SPName&gt;&#xd;
+								&lt;BillId&gt;00000000-0000-0000-0000-084984170262&lt;/BillId&gt;&#xd;
+							&lt;/BillInqRq&gt;&#xd;
+						&lt;/PresSvcRq&gt;&#xd;
+					&lt;/IFX&gt;]]&gt;&lt;/numeroFactura&gt;&#xd;
+		&lt;/ConsultarFacturaPorNumero&gt;&#xd;
+	&lt;/soapenv:Body&gt;&#xd;
+&lt;/soapenv:Envelope&gt;</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain">172.25.59.5</stringProp>
+            <stringProp name="HTTPSampler.port">59055</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
+            <stringProp name="HTTPSampler.path">/ifxwsbancos/ServicioPagosRIN</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            <stringProp name="HTTPSampler.proxyPass">${password}</stringProp>
+            <stringProp name="HTTPSampler.implementation">HttpClient4</stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Aserción de Respuesta" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="49586">200</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+              <boolProp name="Assertion.assume_success">true</boolProp>
+              <intProp name="Assertion.test_type">2</intProp>
+              <stringProp name="Assertion.scope">all</stringProp>
+              <stringProp name="Assertion.custom_message"></stringProp>
+            </ResponseAssertion>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <ThroughputController guiclass="ThroughputControllerGui" testclass="ThroughputController" testname="Throughput Controller" enabled="false">
+          <intProp name="ThroughputController.style">1</intProp>
+          <boolProp name="ThroughputController.perThread">false</boolProp>
+          <intProp name="ThroughputController.maxThroughput">1</intProp>
+          <FloatProperty>
+            <name>ThroughputController.percentThroughput</name>
+            <value>32.0</value>
+            <savedValue>0.0</savedValue>
+          </FloatProperty>
+        </ThroughputController>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Tx_Request_success_ConsultarFacturasPorNit" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;&#xd;
+	&lt;soapenv:Header/&gt;&#xd;
+	&lt;soapenv:Body&gt;&#xd;
+		&lt;ConsultarFacturasPorNit xmlns=&quot;http://tempuri.org/&quot;&gt;&#xd;
+			&lt;nit&gt;&lt;![CDATA[&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#xd;
+					&lt;IFX&gt;&#xd;
+						&lt;SignonRq&gt;&#xd;
+							&lt;ClientDt&gt;2011-06-30T14:51:49&lt;/ClientDt&gt;&#xd;
+							&lt;CustLangPref&gt;es-CO&lt;/CustLangPref&gt;&#xd;
+							&lt;ClientApp&gt;&#xd;
+								&lt;Org&gt;Bancolombia&lt;/Org&gt;&#xd;
+								&lt;Name&gt;RIN&lt;/Name&gt;&#xd;
+								&lt;Version&gt;1.0&lt;/Version&gt;&#xd;
+							&lt;/ClientApp&gt;&#xd;
+						&lt;/SignonRq&gt;&#xd;
+						&lt;PresSvcRq&gt;&#xd;
+							&lt;RqUID&gt;00000000-0000-0000-0000-253878894422&lt;/RqUID&gt;&#xd;
+							&lt;BillInqRq&gt;&#xd;
+								&lt;RqUID&gt;00000000-0000-0000-0000-253878894422&lt;/RqUID&gt;&#xd;
+								&lt;SPName&gt;9319&lt;/SPName&gt;&#xd;
+								&lt;BillerId&gt;&#xd;
+									&lt;SPName&gt;NIT&lt;/SPName&gt;&#xd;
+									&lt;BillerNum&gt;000001069489540&lt;/BillerNum&gt;&#xd;
+								&lt;/BillerId&gt;&#xd;
+							&lt;/BillInqRq&gt;&#xd;
+						&lt;/PresSvcRq&gt;&#xd;
+					&lt;/IFX&gt;]]&gt;&#xd;
+			&lt;/nit&gt;&#xd;
+		&lt;/ConsultarFacturasPorNit&gt;&#xd;
+	&lt;/soapenv:Body&gt;&#xd;
+&lt;/soapenv:Envelope&gt;</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain">172.25.59.5</stringProp>
+            <stringProp name="HTTPSampler.port">59055</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
+            <stringProp name="HTTPSampler.path">/ifxwsbancos/ServicioPagosRIN</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            <stringProp name="HTTPSampler.proxyPass">${password}</stringProp>
+            <stringProp name="HTTPSampler.implementation">HttpClient4</stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Aserción de Respuesta" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="49586">200</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+              <boolProp name="Assertion.assume_success">true</boolProp>
+              <intProp name="Assertion.test_type">2</intProp>
+              <stringProp name="Assertion.scope">all</stringProp>
+              <stringProp name="Assertion.custom_message"></stringProp>
+            </ResponseAssertion>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <ThroughputController guiclass="ThroughputControllerGui" testclass="ThroughputController" testname="Throughput Controller" enabled="false">
+          <intProp name="ThroughputController.style">1</intProp>
+          <boolProp name="ThroughputController.perThread">false</boolProp>
+          <intProp name="ThroughputController.maxThroughput">1</intProp>
+          <FloatProperty>
+            <name>ThroughputController.percentThroughput</name>
+            <value>32.0</value>
+            <savedValue>0.0</savedValue>
+          </FloatProperty>
+        </ThroughputController>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Tx_Request_success_ConsultarFacturasPorNegocio" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:tem=&quot;http://tempuri.org/&quot;&gt;&#xd;
+   &lt;soapenv:Header/&gt;&#xd;
+   &lt;soapenv:Body&gt;&#xd;
+      &lt;tem:ConsultarFacturasPorNegocio&gt;&#xd;
+         &lt;tem:numeroNegocio&gt;&#xd;
+         &lt;![CDATA[&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#xd;
+            &lt;IFX&gt;&#xd;
+               &lt;SignonRq&gt;&#xd;
+                  &lt;ClientDt&gt;2022-09-19T08:01:12&lt;/ClientDt&gt;&#xd;
+                  &lt;CustLangPref&gt;es-CO&lt;/CustLangPref&gt;&#xd;
+                  &lt;ClientApp&gt;&#xd;
+                     &lt;Org&gt;BANCOLOMBIA&lt;/Org&gt;&#xd;
+                     &lt;Name&gt;RIN&lt;/Name&gt;&#xd;
+                     &lt;Version&gt;1.0&lt;/Version&gt;&#xd;
+                  &lt;/ClientApp&gt;&#xd;
+               &lt;/SignonRq&gt;&#xd;
+               &lt;PresSvcRq&gt;&#xd;
+                  &lt;RqUID&gt;00000000-0000-0000-0000-100001398674&lt;/RqUID&gt;&#xd;
+                  &lt;BillInqRq&gt;&#xd;
+                     &lt;RqUID&gt;00000000-0000-0000-0000-100001398674&lt;/RqUID&gt;&#xd;
+                     &lt;SPName&gt;9319&lt;/SPName&gt;&#xd;
+                     &lt;BillerId&gt;&#xd;
+                        &lt;SPName&gt;NEGOCIO&lt;/SPName&gt;&#xd;
+                        &lt;BillerNum&gt;000000093149610&lt;/BillerNum&gt;&#xd;
+                     &lt;/BillerId&gt;&#xd;
+                  &lt;/BillInqRq&gt;&#xd;
+               &lt;/PresSvcRq&gt;&#xd;
+            &lt;/IFX&gt;&#xd;
+]]&gt;&#xd;
+         &lt;/tem:numeroNegocio&gt;&#xd;
+      &lt;/tem:ConsultarFacturasPorNegocio&gt;&#xd;
+   &lt;/soapenv:Body&gt;&#xd;
+&lt;/soapenv:Envelope&gt;</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain">172.25.59.5</stringProp>
+            <stringProp name="HTTPSampler.port">59055</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
+            <stringProp name="HTTPSampler.path">/ifxwsbancos/ServicioPagosRIN</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            <stringProp name="HTTPSampler.proxyPass">${password}</stringProp>
+            <stringProp name="HTTPSampler.implementation">HttpClient4</stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Aserción de Respuesta" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="49586">200</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+              <boolProp name="Assertion.assume_success">true</boolProp>
+              <intProp name="Assertion.test_type">2</intProp>
+              <stringProp name="Assertion.scope">all</stringProp>
+              <stringProp name="Assertion.custom_message"></stringProp>
+            </ResponseAssertion>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <ThroughputController guiclass="ThroughputControllerGui" testclass="ThroughputController" testname="Throughput Controller" enabled="true">
+          <intProp name="ThroughputController.style">1</intProp>
+          <boolProp name="ThroughputController.perThread">false</boolProp>
+          <intProp name="ThroughputController.maxThroughput">1</intProp>
+          <FloatProperty>
+            <name>ThroughputController.percentThroughput</name>
+            <value>100.0</value>
+            <savedValue>0.0</savedValue>
+          </FloatProperty>
+        </ThroughputController>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Tx_Request_success_registrarPagoIFX" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:tem=&quot;http://tempuri.org/&quot;&gt;&#xd;
+	&lt;soapenv:Header/&gt;&#xd;
+	&lt;soapenv:Body&gt;&#xd;
+		&lt;tem:RegistrarPagoIFX&gt;&#xd;
+			&lt;tem:infoPago&gt;&#xd;
+				&lt;![CDATA[&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#xd;
+					&lt;IFX&gt;&#xd;
+						&lt;SignonRq&gt;&#xd;
+							&lt;ClientDt&gt;2023-03-07T11:25:13&lt;/ClientDt&gt;&#xd;
+							&lt;CustLangPref&gt;es-CO&lt;/CustLangPref&gt;&#xd;
+							&lt;ClientApp&gt;&#xd;
+								&lt;Org&gt;Bancolombia&lt;/Org&gt;&#xd;
+								&lt;Name&gt;RIN&lt;/Name&gt;&#xd;
+								&lt;Version&gt;1.0&lt;/Version&gt;&#xd;
+							&lt;/ClientApp&gt;&#xd;
+						&lt;/SignonRq&gt;&#xd;
+						&lt;PaySvcRq&gt;&#xd;
+							&lt;RqUID&gt;00000000-0000-0000-0000-009103478527&lt;/RqUID&gt;&#xd;
+							&lt;MsgRqHdr&gt;&#xd;
+								&lt;NetworkTrnInfo&gt;&#xd;
+									&lt;NetworkOwner&gt;2&lt;/NetworkOwner&gt;&#xd;
+									&lt;BankId&gt;7&lt;/BankId&gt;&#xd;
+								&lt;/NetworkTrnInfo&gt;&#xd;
+								&lt;PointOfServiceData&gt;&#xd;
+									&lt;Environment/&gt;&#xd;
+									&lt;POSAgent&gt;&#xd;
+										&lt;AgentId&gt;0000&lt;/AgentId&gt;&#xd;
+									&lt;/POSAgent&gt;&#xd;
+									&lt;POSLocation&gt;00000&lt;/POSLocation&gt;&#xd;
+								&lt;/PointOfServiceData&gt;&#xd;
+							&lt;/MsgRqHdr&gt;&#xd;
+							&lt;SPName&gt;76309&lt;/SPName&gt;&#xd;
+							&lt;PmtAddRq&gt;&#xd;
+								&lt;RqUID&gt;00000000-0000-0000-0000-009103478527&lt;/RqUID&gt;&#xd;
+								&lt;PmtInfo&gt;&#xd;
+									&lt;CurAmt&gt;&#xd;
+										&lt;Amt&gt;22373.00&lt;/Amt&gt;&#xd;
+										&lt;CurCode&gt;E&lt;/CurCode&gt;&#xd;
+									&lt;/CurAmt&gt;&#xd;
+									&lt;RemitInfo&gt;&#xd;
+										&lt;CustPayeeId&gt;0&lt;/CustPayeeId&gt;&#xd;
+										&lt;BillId&gt;00000000-0000-0000-0000-089531890239&lt;/BillId&gt;&#xd;
+										&lt;PmtId&gt;00000000000002&lt;/PmtId&gt;&#xd;
+										&lt;CurAmt&gt;&#xd;
+											&lt;Amt&gt;22373.00&lt;/Amt&gt;&#xd;
+										&lt;/CurAmt&gt;&#xd;
+									&lt;/RemitInfo&gt;&#xd;
+									&lt;DepAcctIdFrom&gt;&#xd;
+										&lt;AcctId/&gt;&#xd;
+										&lt;AcctType&gt;Default&lt;/AcctType&gt;&#xd;
+										&lt;BankInfo/&gt;&#xd;
+									&lt;/DepAcctIdFrom&gt;&#xd;
+									&lt;PrcDt&gt;2023-03-07&lt;/PrcDt&gt;&#xd;
+								&lt;/PmtInfo&gt;&#xd;
+							&lt;/PmtAddRq&gt;&#xd;
+						&lt;/PaySvcRq&gt;&#xd;
+					&lt;/IFX&gt;]]&gt;&#xd;
+			&lt;/tem:infoPago&gt;&#xd;
+		&lt;/tem:RegistrarPagoIFX&gt;&#xd;
+	&lt;/soapenv:Body&gt;&#xd;
+&lt;/soapenv:Envelope&gt;</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain">172.25.59.5</stringProp>
+            <stringProp name="HTTPSampler.port">59055</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
+            <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
+            <stringProp name="HTTPSampler.path">/ifxwsbancos/ServicioPagosRIN</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            <stringProp name="HTTPSampler.proxyPass">${password}</stringProp>
+            <stringProp name="HTTPSampler.implementation">HttpClient4</stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Aserción de Respuesta" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="49586">200</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+              <boolProp name="Assertion.assume_success">true</boolProp>
+              <intProp name="Assertion.test_type">2</intProp>
+              <stringProp name="Assertion.scope">all</stringProp>
+              <stringProp name="Assertion.custom_message"></stringProp>
+            </ResponseAssertion>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="variables" enabled="true">
+          <collectionProp name="Arguments.arguments">
+            <elementProp name="ip" elementType="Argument">
+              <stringProp name="Argument.name">ip</stringProp>
+              <stringProp name="Argument.value">${__P(ip,172.25.59.4)}</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="port" elementType="Argument">
+              <stringProp name="Argument.name">port</stringProp>
+              <stringProp name="Argument.value">${__P(port,59055)}</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+          </collectionProp>
+        </Arguments>
+        <hashTree/>
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+        <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table" enabled="true">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>

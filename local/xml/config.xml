@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<servicio id="WSP_RIN_JAVERIANACALI">
+    <requestDummy>local:///WSP_RIN_JAVERIANACALI/xsl/transform_request.xsl</requestDummy>
+    <responseDummy>local:///WSP_RIN_JAVERIANACALI/xsl/transform_response.xsl</responseDummy>
+    <requestMetodos>local:///WSP_RIN_JAVERIANACALI/xsl/transform_request.xsl</requestMetodos>
+    <responseMetodos>local:///WSP_RIN_JAVERIANACALI/xsl/transform_response.xsl</responseMetodos>
+    <tlsCertificado>SSL_CLT_RIN_JAVERIANACALI</tlsCertificado>
+    <firmaRequest/>
+    <firmaReponse/>
+    <cifradoRequest/>
+    <cifradoReponse/>
+    <wsdl>local:///WSP_RIN_JAVERIANACALI/wsdl/WSP_RIN_JAVERIANACALI.wsdl</wsdl>
+    <basicAuthorization>false</basicAuthorization>
+    <soapUsernamePassword>false</soapUsernamePassword>
+    <usernameTokenWSSecurity>false</usernameTokenWSSecurity>
+</servicio>

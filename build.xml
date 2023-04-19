@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="despliegue-servicio" basedir="." default="deploy">
+	<description>
+		Tarea de despliegue del servcio WSP_RIN_JAVERIANACALI
+	</description>
+
+	<property environment="env"/>
+
+	<property name="dpIP" value="{env.DP_IP}"/>
+	<property name="dpXMLMGMTPort" value="59020"/>
+	<property name="dpSSHPort" value="22"/>
+	<property name="dpTargetDomain" value="CashManagement"/>
+
+
+	<basename property="dpFolderName" file="WSP_RIN_JAVERIANACALI"/>
+	<property name="configFile" value="${dpFolderName}.cfg"/>
+	<property name="username" value="{env.DP_USERNAME}"/>
+	<property name="password" value="{env.DP_PASSWORD}"/>
+
+	<target name="upload-files" description="Sube los archivos de local al DP">
+		<taskdef name="upload" classname="vcsoft.bancolombia.dp.deployment.ant.FilesUploader" classpath="DPServiceDeployer.jar"/>
+		<upload local="${basedir}" target="https://${dpIP}:${dpXMLMGMTPort}/service/mgmt/current" sslverify="false"
+			dpfolder="${dpFolderName}" domain="${dpTargetDomain}"
+			username="${username}" password="${password}"/>
+	</target>
+
+	<target name="exec-config" description="Ejecuta los comandos de configuracion a traves de SSH">
+		<property name="tmpDir" value="${basedir}/deployment.tmp"/>
+		<property name="tmpConfigFile" value="${tmpDir}/config.tmp"/>
+		<mkdir dir="${basedir}/deployment.tmp"/>
+		<echo message="${username}${line.separator}" file="${tmpConfigFile}"/>
+		<echo message="${password}${line.separator}" file="${tmpConfigFile}" append="true"/>
+		<echo message="${dpTargetDomain}${line.separator}" file="${tmpConfigFile}" append="true"/>
+		<echo message="switch domain ${dpTargetDomain};${line.separator}" file="${tmpConfigFile}" append="true"/>
+		<concat destfile="${tmpConfigFile}" append="true">
+			<filelist dir="${basedir}/config" files="${configFile}"/>
+		</concat>
+		<exec executable="ssh" dir="${tmpDir}" input="${tmpConfigFile}">
+			<arg value="-p ${dpSSHPort}"/>
+			<arg value="${dpIP}"/>
+		</exec>
+		<delete dir="${tmpDir}"/>
+	</target>
+
+	<target name="deploy" description="Despliega el servicio completo, es decir, sube los archivos y luego ejecuta la configuracion">
+		<antcall target="upload-files"/>
+		<antcall target="exec-config"/>
+	</target>
+</project>
