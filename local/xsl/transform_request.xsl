@@ -71,7 +71,7 @@
                              operacion -->
                         <dp:set-http-request-header name="'Content-type'"
                                                     value="concat('application/soap+xml;charset=UTF-8;action=&quot;http://tempuri.org/IWCFPagoVentanilla/VerificarEstadoWebServiceGen&quot;')" />
-                        <dp:freeze-headers />
+                       
                         <!-- Mapeo del Body para la trama dummy -->
                         <soapenv:Header>
                             
@@ -94,7 +94,7 @@
                              operacion -->
                         <dp:set-http-request-header name="'Content-type'"
                                                     value="concat('application/soap+xml;charset=UTF-8;action=&quot;http://tempuri.org/IWCFPagoVentanilla/ConsultarCuponesGen&quot;')" />
-                        <dp:freeze-headers />
+                        
                         <!--Variables
                              para la construccion del mensaje Request-->
                         <xsl:variable name="sPNameConsulta"
@@ -129,7 +129,7 @@
                                     <!--Optional:-->
                                     <jav:SpName><xsl:value-of select="$sPNameConsulta"/></jav:SpName>
                                     <!--Optional:-->
-                                    <jav:Date><xsl:value-of select="$clientDtConsulta"/></jav:Date>
+                                    <jav:Date><xsl:value-of select="concat(substring($clientDt,1,4), substring($clientDt,6,2), substring($clientDt,9,2))"/></jav:Date>
                                     <!--Optional:-->
                                     <jav:Ref><xsl:value-of select="format-number(substring-before(substring-after($billIdConsulta, '(8020)'),'(3900)'), '#')"/></jav:Ref>
                                     <!--Optional:-->
@@ -250,7 +250,7 @@
                              operacion -->
                         <dp:set-http-request-header name="'Content-type'"
                                                     value="concat('application/soap+xml;charset=UTF-8;action=&quot;http://tempuri.org/IWCFPagoVentanilla/RegistrarPagoIFXGen&quot;')" />
-                        <dp:freeze-headers />
+                        
                         <!--Variables
                              para la construccion del mensaje Request-->
                         <xsl:variable name="sPNamePago"
@@ -309,7 +309,7 @@
                                     <!--Optional:-->
                                     <jav:SpName><xsl:value-of select="$sPNamePago"/></jav:SpName>
                                     <!--Optional:-->
-                                    <jav:Date><xsl:value-of select="$clientDt"/></jav:Date>
+                                    <jav:Date><xsl:value-of select="concat(substring($clientDt,1,4), substring($clientDt,6,2), substring($clientDt,9,2))"/></jav:Date>
                                     <!--Optional:-->
                                     <jav:Ref><xsl:value-of select="format-number(substring-before(substring-after($billIdPago, '(8020)'),'(3900)'), '#')"/></jav:Ref>
                                     <!--Optional:-->
@@ -319,10 +319,10 @@
                                     <!--Optional:-->
                                     <jav:NetworkOwner><xsl:value-of select="$networkOwnerPago"/></jav:NetworkOwner>
                                     <!--Optional:-->
-                                    <jav:BankId><xsl:value-of select="007"/></jav:BankId>
+                                    <jav:BankId>07</jav:BankId>
                                     <!--Optional:-->
                                     <jav:PosLocation><xsl:value-of select="$pOSLocation"/></jav:PosLocation>
-                                    <jav:Value><xsl:value-of select="amtPago"/></jav:Value>
+                                    <jav:Value><xsl:value-of select="substring-before($amtPago, '.')"/> </jav:Value>
                                     <!--Optional:-->
                                     <jav:User><xsl:value-of select="$username"/></jav:User>
                                     <!--Optional:-->
