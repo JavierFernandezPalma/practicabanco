@@ -105,7 +105,7 @@
                             <xsl:variable name="RqUIDResponse" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PresSvcRq']/*[local-name()='BilllnqRs']/*[local-name()='RqUID']"/>
                             
                             <!-- generar el tag para la peticion2-->
-                            <xsl:variable name="BillResponse" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PresSvcRq']/*[local-name()='BilllnqRs']/*[local-name()='BillRec']/*[local-name()='Billld']"/>
+                            <xsl:variable name="BillIdResponse" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PresSvcRq']/*[local-name()='BilllnqRs']/*[local-name()='BillRec']/*[local-name()='BillId']"/>
                             
                             <xsl:variable name="varIFX">
                                 <IFX>
