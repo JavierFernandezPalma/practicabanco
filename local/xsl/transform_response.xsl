@@ -57,28 +57,68 @@
                         <!-- Si el metodo es envioTramaDummy se construye mensaje de respuesta -->
                         <xsl:when test="dp:variable('var://context/transaction/method')='envioTramaDummy'">
                             <!--Esta valor debe ser extraido del mensaje del cliente para su homologacion hacia el mensaje IFX de respuesta-->
-                            <xsl:copy-of select="vcsoft:buildDummySoapResponse($httpError)/*[local-name()='Envelope']/*[local-name()='Body']/*[1]"/>
+                            <xsl:variable name="statusCode" select="*[local-name()='Envelope']/*[local-name()='Body']/*[local-name()='dummyResponse']/*[local-name()='dummyResult']/*[local-name()='Code']/*[local-name()='Description']"/>
+                            <soapenv:Envelope xmlns:ban1="http://schemas.datacontract.org/2004/07/BankPaymentManagement" xmlns:ban="BankPaymentManagement" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tram="http://TramaDummyRIN/">
+                                <soapenv:Header />
+                                <soapenv:Body>
+                                    <tram:envioTramaDummyResponse>
+                                        <tram:salidaResponse>
+                                            <xsl:choose>
+                                                <!-- Validar codigo de respuesta http del cliente -->
+                                                <xsl:when test="$statusCode='0'">
+                                                    <respuesta>0</respuesta>
+                                                    <descripcion>Exitoso</descripcion>
+                                                </xsl:when>
+                                                <xsl:otherwise>
+                                                    <respuesta>100</respuesta>
+                                                    <descripcion>Error</descripcion>
+                                                </xsl:otherwise>
+                                            </xsl:choose>
+                                        </tram:salidaResponse>
+                                    </tram:envioTramaDummyResponse>
+                                </soapenv:Body>
+                            </soapenv:Envelope>
                         </xsl:when>
                         <!-- Si el metodo es ConsultarFacturasPorNumero se construye mensaje de respuesta -->
                         <xsl:when test="dp:variable('var://context/transaction/method')='ConsultarFacturaPorNumero'">
                             <!--Esta valor debe ser extraido del mensaje del cliente para su homologacion hacia el mensaje IFX de respuesta-->
                             <xsl:variable name="amtConsulta" select="normalize-space(substring-before(substring-after($soapBody, '&lt;Amt&gt;'), '&lt;/Amt'))"/>                                   
                             <xsl:variable name="statusCode" select="normalize-space(substring-before(substring-after($soapBody, 'StatusCode&gt;'), '&lt;/StatusCode'))"/>
-                            <xsl:variable name="clientDtConsulta" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='SignonRq']/*[local-name()='ClientDt']"/>                               
+                            <xsl:variable name="clientDtConsulta" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='SignonRq']/*[local-name()='ClientDt']"/> 
+
                             <xsl:variable name="rqUIDConsulta" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PresSvcRq']/*[local-name()='RqUID']"/>
+                            
                             <xsl:variable name="billIdConsulta" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PresSvcRq']/*[local-name()='BillInqRq']/*[local-name()='BillId']"/>
                             <xsl:variable name="billingAcct" select="normalize-space(substring-before(substring-after($soapBody, 'BillingAcct&gt;'), '&lt;/BillingAcct'))"/>
+
+
+                            <!-- tag ruta cliente-->
+                            <xsl:variable name="CodeResponse" select="*[local-name()='Envelope']/*[local-name()='Body']/*[local-name()='consultaRecaudoResponse']/*[local-name()='consultaRecaudoResult']/*[local-name()='Code']"/>
+                            
+                            <!-- tag ruta codigos respuesta cliente-->
+                            <xsl:variable name="StatusCodeResponse" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PresSvcRs']/*[local-name()='BilllnqRs']/*[local-name()='Status']/*[local-name()='StatusCode']"/>
+                            
+                            <!-- tag homologar descripcion javerianacali-->
+                            <xsl:variable name="StatusDescResponse" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PresSvcRs']/*[local-name()='BilllnqRs']/*[local-name()='Status']/*[local-name()='StatusDesc']"/>
+                            
+                            <!-- generar el tag para la peticion 1-->
+                            <xsl:variable name="RqUIDResponse" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PresSvcRq']/*[local-name()='BilllnqRs']/*[local-name()='RqUID']"/>
+                            
+                            <!-- generar el tag para la peticion2-->
+                            <xsl:variable name="BillResponse" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PresSvcRq']/*[local-name()='BilllnqRs']/*[local-name()='BillRec']/*[local-name()='Billld']"/>
+                            
                             <xsl:variable name="varIFX">
                                 <IFX>
                                     <SignonRs>
                                         <ClientDt>
                                             <xsl:value-of select="$currentDateTime"/>
+                                            
                                         </ClientDt>
                                         <CustLangPref>es-CO</CustLangPref>
                                         <ClientApp>
-                                            <Org>EPM</Org>
-                                            <Name>EPM</Name>
-                                            <Version>1</Version>
+                                            <Org>U_Javeriana de Cali</Org>
+                                            <Name>U_Javeriana de Cali</Name>
+                                            <Version>1.0</Version>
                                         </ClientApp>
                                         <ServerDt>
                                             <xsl:value-of select="$currentDateTime"/>
@@ -93,7 +133,7 @@
                                             <!--Este Nodo debe ser homologado tomando como referencia los codigos de respuesta del cliente-->
                                             <Status>
                                                 <xsl:choose>
-                                                    <xsl:when test="$statusCode='0'">
+                                                     <xsl:when test="$CodeResponse='0'">
                                                         <StatusCode>
                                                             <xsl:value-of select="'0'"/>
                                                         </StatusCode>
@@ -102,174 +142,27 @@
                                                     </xsl:when>
                                                     <xsl:otherwise>
                                                         <xsl:choose>
-                                                            <xsl:when test="$statusCode='3548'">
+                                                            <xsl:when test="$CodeResponse='-001'">
                                                                 <StatusCode>
                                                                     <xsl:value-of select="'-001'"/>
                                                                 </StatusCode>
                                                                 <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
+                                                                <StatusDesc>La Factura no existe</StatusDesc>
                                                             </xsl:when>
-                                                            <xsl:when test="$statusCode='10523'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='10602'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='10603'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='10622'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='10633'">
+                                                            <xsl:when test="$CodeResponse='-099'">
                                                                 <StatusCode>
                                                                     <xsl:value-of select="'-099'"/>
                                                                 </StatusCode>
                                                                 <Severity>Error</Severity>
-                                                                <StatusDesc>Error tecnico</StatusDesc>
+                                                                <StatusDesc>Error de conexion</StatusDesc>
                                                             </xsl:when>
-                                                            <xsl:when test="$statusCode='12024'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='12202'">
+                                                            <xsl:when test="$CodeResponse='-006'">
                                                                 <StatusCode>
                                                                     <xsl:value-of select="'-006'"/>
                                                                 </StatusCode>
                                                                 <Severity>Error</Severity>
-                                                                <StatusDesc>Nro. De transaccion duplicado</StatusDesc>
-                                                            </xsl:when>                                                            
-                                                            <xsl:when test="$statusCode='12427'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='12428'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-099'"/>
-                                                                </StatusCode>
-                                                                <Severity>Error</Severity>
-                                                                <StatusDesc>Error tecnico</StatusDesc>
-                                                            </xsl:when>   
-                                                            <xsl:when test="$statusCode='12431'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-002'"/>
-                                                                </StatusCode>
-                                                                <Severity>Error</Severity>
-                                                                <StatusDesc>Factura ya fue pagada</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='12432'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-006'"/>
-                                                                </StatusCode>
-                                                                <Severity>Error</Severity>
-                                                                <StatusDesc>Nro. De transaccion duplicado</StatusDesc>
-                                                            </xsl:when>                                                                                                                                                                               
-                                                            <xsl:when test="$statusCode='12438'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='12439'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='12447'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='12448'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='12449'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-002'"/>
-                                                                </StatusCode>
-                                                                <Severity>Error</Severity>
-                                                                <StatusDesc>Factura ya fue pagada</StatusDesc>
-                                                            </xsl:when>                                                            
-                                                            <xsl:when test="$statusCode='12452'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='12462'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='10429'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-099'"/>
-                                                                </StatusCode>
-                                                                <Severity>Error</Severity>
-                                                                <StatusDesc>Error tecnico</StatusDesc>
-                                                            </xsl:when>                                                            
-                                                            <xsl:when test="$statusCode='6161'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='12518'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='10726'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-002'"/>
-                                                                </StatusCode>
-                                                                <Severity>Error</Severity>
-                                                                <StatusDesc>Factura ya fue pagada</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='-099'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-099'"/>
-                                                                </StatusCode>
-                                                                <Severity>Error</Severity>
-                                                                <StatusDesc>Error tecnico</StatusDesc>
-                                                            </xsl:when>                                                                                                                      
+                                                                <StatusDesc>La transaccion ya existe</StatusDesc>
+                                                            </xsl:when>                                                                                                                               
                                                         </xsl:choose>
                                                     </xsl:otherwise>
                                                 </xsl:choose>
@@ -278,7 +171,7 @@
                                                 <xsl:value-of select="$rqUIDConsulta"/>
                                             </RqUID>
                                             <!-- Si el codigo de respuesta es exitoso-->
-                                            <xsl:if test="$statusCode='0'">
+                                            <xsl:if test="$CodeResponse='0'">
                                                 <BillRec>
                                                     <BillId>
                                                         <xsl:value-of select="$billIdConsulta"/>
@@ -287,7 +180,7 @@
                                                         <BillType>Bill</BillType>
                                                         <PresAcctId>
                                                             <BillingAcct>
-                                                                <xsl:value-of select="$billingAcct"/>
+                                                                0
                                                             </BillingAcct>
                                                             <BillerId>
                                                                 <SPName>RIN</SPName>
@@ -314,7 +207,7 @@
                                                         </BillSummAmt>
                                                         <BillSummAmt>
                                                             <BillSummAmtCode>TotalAmtDue</BillSummAmtCode>
-                                                            <ShortDesc>Valor total de la factura</ShortDesc>
+                                                            <ShortDesc>Valor Total de la Factura</ShortDesc>
                                                             <CurAmt>
                                                                 <Amt>
                                                                     <xsl:value-of select="concat($amtConsulta,'.00')"/> 
@@ -341,8 +234,8 @@
                         <!-- Si el metodo es ConsultarFacturasPorNegocio se construye mensaje de respuesta -->
                         <xsl:when test="dp:variable('var://context/transaction/method')='ConsultarFacturasPorNegocio'">
                             <!--Esta valor debe ser extraido del mensaje del cliente para su homologacion hacia el mensaje IFX de respuesta-->
-                            <xsl:variable name="clientDtNegocio" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='SignonRq']/*[local-name()='ClientDt']"/>
                             <xsl:variable name="rqUIDNegocio" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PresSvcRq']/*[local-name()='RqUID']"/>
+                            <xsl:variable name="clientDtNegocio" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='SignonRq']/*[local-name()='ClientDt']"/>
                             <xsl:variable name="billerNumNegocio" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PresSvcRq']/*[local-name()='BillInqRq']/*[local-name()='BillerId']/*[local-name()='BillerNum']"/>
                             <xsl:variable name="billingAcct" select="*[local-name()='Envelope']/*[local-name()='Body']/*[local-name()='simularReturn']/*[local-name()='R_WSConBcolCC']/*[local-name()='R_Cedula']/*[local-name()='R_BillInqRs']/*[local-name()='R_BillingAcct']"/>
                             <xsl:variable name="statusCode" select="normalize-space(substring-before(substring-after($soapBody, 'StatusCode&gt;'), '&lt;/StatusCode'))"/>
@@ -363,8 +256,8 @@
                                         </ClientDt>
                                         <CustLangPref>es-CO</CustLangPref>
                                         <ClientApp>
-                                            <Org>EPM</Org>
-                                            <Name>EPM</Name>
+                                            <Org>U_Javeriana de Cali</Org>
+                                            <Name>U_Javeriana de Cali</Name>
                                             <Version>1.0</Version>
                                         </ClientApp>
                                         <ServerDt>
@@ -389,174 +282,27 @@
                                                     </xsl:when>
                                                     <xsl:otherwise>
                                                         <xsl:choose>
-                                                            <xsl:when test="$statusCode='3548'">
+                                                            <xsl:when test="$statusCode='-001'">
                                                                 <StatusCode>
                                                                     <xsl:value-of select="'-001'"/>
                                                                 </StatusCode>
                                                                 <Severity>Info</Severity>
                                                                 <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='10523'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='10602'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='10603'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='10622'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='10633'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-099'"/>
-                                                                </StatusCode>
-                                                                <Severity>Error</Severity>
-                                                                <StatusDesc>Error tecnico</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='12024'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='12202'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-006'"/>
-                                                                </StatusCode>
-                                                                <Severity>Error</Severity>
-                                                                <StatusDesc>Nro. De transaccion duplicado</StatusDesc>
-                                                            </xsl:when>                                                            
-                                                            <xsl:when test="$statusCode='12427'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='12428'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-099'"/>
-                                                                </StatusCode>
-                                                                <Severity>Error</Severity>
-                                                                <StatusDesc>Error tecnico</StatusDesc>
-                                                            </xsl:when>   
-                                                            <xsl:when test="$statusCode='12431'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-002'"/>
-                                                                </StatusCode>
-                                                                <Severity>Error</Severity>
-                                                                <StatusDesc>Factura ya fue pagada</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='12432'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-006'"/>
-                                                                </StatusCode>
-                                                                <Severity>Error</Severity>
-                                                                <StatusDesc>Nro. De transaccion duplicado</StatusDesc>
-                                                            </xsl:when>                                                                                                                                                                               
-                                                            <xsl:when test="$statusCode='12438'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='12439'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='12447'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='12448'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='12449'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-002'"/>
-                                                                </StatusCode>
-                                                                <Severity>Error</Severity>
-                                                                <StatusDesc>Factura ya fue pagada</StatusDesc>
-                                                            </xsl:when>                                                            
-                                                            <xsl:when test="$statusCode='12452'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='12462'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='10429'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-099'"/>
-                                                                </StatusCode>
-                                                                <Severity>Error</Severity>
-                                                                <StatusDesc>Error tecnico</StatusDesc>
-                                                            </xsl:when>                                                            
-                                                            <xsl:when test="$statusCode='6161'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='12518'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='10726'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-002'"/>
-                                                                </StatusCode>
-                                                                <Severity>Error</Severity>
-                                                                <StatusDesc>Factura ya fue pagada</StatusDesc>
                                                             </xsl:when>
                                                             <xsl:when test="$statusCode='-099'">
                                                                 <StatusCode>
-                                                                    <xsl:value-of select="'-099'"/>
+                                                                    <xsl:value-of select="'-001'"/>
+                                                                </StatusCode>
+                                                                <Severity>Info</Severity>
+                                                                <StatusDesc>Factura no existe</StatusDesc>
+                                                            </xsl:when>
+                                                            <xsl:when test="$statusCode='-066'">
+                                                                <StatusCode>
+                                                                    <xsl:value-of select="'-066'"/>
                                                                 </StatusCode>
                                                                 <Severity>Error</Severity>
-                                                                <StatusDesc>Error tecnico</StatusDesc>
-                                                            </xsl:when>                                                                                                                      
+                                                                <StatusDesc>La transaccion ya existe</StatusDesc>
+                                                            </xsl:when>                                                                                                                  
                                                         </xsl:choose>
                                                     </xsl:otherwise>
                                                 </xsl:choose>
@@ -695,13 +441,47 @@
                             <xsl:variable name="isValidConfirmation" select="string($parsedMessage/*[local-name()='Body']/*[local-name()='BankPaymentConfirmation']/*[local-name()='isValidConfirmation'])"/>
                             <xsl:variable name="rqUIDPago" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRq']/*[local-name()='RqUID']"/>
                             <xsl:variable name="sPNamePago" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRq']/*[local-name()='SPName']"/>
-                            <xsl:variable name="statusCode" select="normalize-space(substring-before(substring-after($soapBody, 'StatusCode&gt;'), '&lt;/StatusCode'))"/>
+                            
+                            <xsl:variable name="statusCode" select="*[local-name()='Envelope']/*[local-name()='Body']/*[local-name()='consultaRecaudoResponse']/*[local-name()='consultaRecaudoResult']/*[local-name()='Code']"/>
+                            
                             <xsl:variable name="billIdPago" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRq']/*[local-name()='PmtAddRq']/*[local-name()='PmtInfo']/*[local-name()='RemitInfo']/*[local-name()='BillId']"/>
                             <!-- <xsl:variable name="amtPago" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRq']/*[local-name()='PmtAddRq']/*[local-name()='PmtInfo']/*[local-name()='CurAmt']/*[local-name()='Amt']"/> -->
                             <xsl:variable name="amtPagoRequest" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRq']/*[local-name()='PmtAddRq']/*[local-name()='PmtInfo']/*[local-name()='CurAmt']/*[local-name()='Amt']"/>
                             <xsl:variable name="amtPagoRequest2" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRq']/*[local-name()='PmtAddRq']/*[local-name()='PmtInfo']/*[local-name()='RemitInfo']/*[local-name()='CurAmt']/*[local-name()='Amt']"/>
                             <xsl:variable name="asyncRqUID" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRq']/*[local-name()='PmtAddRq']/*[local-name()='RqUID']"/>
                             <xsl:variable name="serverDtPago" select="normalize-space(substring-before(substring-after($soapBody, 'ServerDt&gt;'), '&lt;/ServerDt'))"/>
+
+                             <xsl:variable name="sPNamePago" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRs']/*[local-name()='SPName']"/>
+                             
+                            <!-- generar el tag para la peticion 1-->
+                            <xsl:variable name="rqUIDConsulta" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRs']/*[local-name()='RqUID']"/>
+
+                            <!-- tag ruta homologar codigos respuesta-->
+                            <xsl:variable name="StatusCodeResponse" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRs']/*[local-name()='PmtAddRs']/*[local-name()='Status']/*[local-name()='StatusCode']"/>
+                            
+                            <xsl:variable name="StatusDescResponse" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRs']/*[local-name()='PmtAddRs']/*[local-name()='Status']/*[local-name()='severity']"/>
+
+                            <!-- tag homologar descripcion javerianacali-->
+                            <xsl:variable name="StatusDescResponse" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRs']/*[local-name()='PmtAddRs']/*[local-name()='Status']/*[local-name()='StatusDesc']"/>
+                            
+
+                            <!-- generar el tag para la peticion 3-->
+                            <xsl:variable name="BillResponse" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRs']/*[local-name()='PmtAddRs']/*[local-name()='RqUID']"/>
+
+                            
+                            <xsl:variable name="billIdPago" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRs']/*[local-name()='PmtAddRs']/*[local-name()='PmtInfo']/*[local-name()='RemitInfo']/*[local-name()='BillId']"/>
+
+                            <xsl:variable name="amtPagoRequest" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRq']/*[local-name()='PmtAddRs']/*[local-name()='PmtInfo']/*[local-name()='RemitInfo']/*[local-name()='CurAmt']/*[local-name()='Amt']"/>
+
+
+                           <xsl:variable name="billIdPago" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRs']/*[local-name()='PmtAddRs']/*[local-name()='PmtInfo']/*[local-name()='DepAccIdFrom']/*[local-name()='AcctId']"/> 
+
+                             <xsl:variable name="billIdPago" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRs']/*[local-name()='PmtAddRs']/*[local-name()='PmtInfo']/*[local-name()='DepAccIdFrom']/*[local-name()='BannkInfo']"/>
+
+                             
+                            <xsl:variable name="BillResponse" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRs']/*[local-name()='PmtAddRs']/*[local-name()='AsyncRqUID']"/>>
+                            
+                            
                             <xsl:variable name="varIFX">
                                 <IFX>
                                     <SignonRs>
@@ -710,8 +490,8 @@
                                         </ClientDt>
                                         <CustLangPref>es-CO</CustLangPref>
                                         <ClientApp>
-                                            <Org>EPM</Org>
-                                            <Name>EPM</Name>
+                                            <Org>U_Javeriana de Cali</Org>
+                                            <Name>U_Javeriana de Cali</Name>
                                             <Version>1.0</Version>
                                         </ClientApp>
                                         <ServerDt>
@@ -737,174 +517,27 @@
                                                     </xsl:when>
                                                     <xsl:otherwise>
                                                         <xsl:choose>
-                                                            <xsl:when test="$statusCode='3548'">
+                                                            <xsl:when test="$statusCode='-001'">
                                                                 <StatusCode>
                                                                     <xsl:value-of select="'-001'"/>
                                                                 </StatusCode>
                                                                 <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='10523'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='10602'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='10603'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='10622'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='10633'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-099'"/>
-                                                                </StatusCode>
-                                                                <Severity>Error</Severity>
-                                                                <StatusDesc>Error tecnico</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='12024'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='12202'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-006'"/>
-                                                                </StatusCode>
-                                                                <Severity>Error</Severity>
-                                                                <StatusDesc>Nro. De transaccion duplicado</StatusDesc>
-                                                            </xsl:when>                                                            
-                                                            <xsl:when test="$statusCode='12427'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='12428'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-099'"/>
-                                                                </StatusCode>
-                                                                <Severity>Error</Severity>
-                                                                <StatusDesc>Error tecnico</StatusDesc>
-                                                            </xsl:when>   
-                                                            <xsl:when test="$statusCode='12431'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-002'"/>
-                                                                </StatusCode>
-                                                                <Severity>Error</Severity>
-                                                                <StatusDesc>Factura ya fue pagada</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='12432'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-006'"/>
-                                                                </StatusCode>
-                                                                <Severity>Error</Severity>
-                                                                <StatusDesc>Nro. De transaccion duplicado</StatusDesc>
-                                                            </xsl:when>                                                                                                                                                                               
-                                                            <xsl:when test="$statusCode='12438'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='12439'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='12447'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='12448'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='12449'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-002'"/>
-                                                                </StatusCode>
-                                                                <Severity>Error</Severity>
-                                                                <StatusDesc>Factura ya fue pagada</StatusDesc>
-                                                            </xsl:when>                                                            
-                                                            <xsl:when test="$statusCode='12452'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='12462'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='10429'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-099'"/>
-                                                                </StatusCode>
-                                                                <Severity>Error</Severity>
-                                                                <StatusDesc>Error tecnico</StatusDesc>
-                                                            </xsl:when>                                                            
-                                                            <xsl:when test="$statusCode='6161'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='12518'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-001'"/>
-                                                                </StatusCode>
-                                                                <Severity>Info</Severity>
-                                                                <StatusDesc>Factura no existe</StatusDesc>
-                                                            </xsl:when>
-                                                            <xsl:when test="$statusCode='10726'">
-                                                                <StatusCode>
-                                                                    <xsl:value-of select="'-002'"/>
-                                                                </StatusCode>
-                                                                <Severity>Error</Severity>
-                                                                <StatusDesc>Factura ya fue pagada</StatusDesc>
+                                                                <StatusDesc>La Factura no existe</StatusDesc>
                                                             </xsl:when>
                                                             <xsl:when test="$statusCode='-099'">
                                                                 <StatusCode>
                                                                     <xsl:value-of select="'-099'"/>
                                                                 </StatusCode>
                                                                 <Severity>Error</Severity>
-                                                                <StatusDesc>Error tecnico</StatusDesc>
-                                                            </xsl:when>                                                                                                                      
+                                                                <StatusDesc>Error de conexion</StatusDesc>
+                                                            </xsl:when>
+                                                            <xsl:when test="$statusCode='-006'">
+                                                                <StatusCode>
+                                                                    <xsl:value-of select="'-006'"/>
+                                                                </StatusCode>
+                                                                <Severity>Error</Severity>
+                                                                <StatusDesc>La transaccion ya existe</StatusDesc>
+                                                            </xsl:when>
                                                         </xsl:choose>
                                                     </xsl:otherwise>
                                                 </xsl:choose>
@@ -946,7 +579,7 @@
                                                         </BillId>
                                                         <CurAmt>
                                                             <Amt>
-                                                                <xsl:value-of select="$amtPagoRequest2"/>
+                                                                <xsl:value-of select="$amtPagoRequest"/>
                                                             </Amt>
                                                         </CurAmt>
                                                     </RemitInfo>
