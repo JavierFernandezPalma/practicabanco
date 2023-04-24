@@ -450,21 +450,36 @@
                             <xsl:variable name="amtPagoRequest2" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRq']/*[local-name()='PmtAddRq']/*[local-name()='PmtInfo']/*[local-name()='RemitInfo']/*[local-name()='CurAmt']/*[local-name()='Amt']"/>
                             <xsl:variable name="asyncRqUID" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRq']/*[local-name()='PmtAddRq']/*[local-name()='RqUID']"/>
                             <xsl:variable name="serverDtPago" select="normalize-space(substring-before(substring-after($soapBody, 'ServerDt&gt;'), '&lt;/ServerDt'))"/>
+
+                             <xsl:variable name="sPNamePago" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRs']/*[local-name()='SPName']"/>
                              
                             <!-- generar el tag para la peticion 1-->
-                             <xsl:variable name="rqUIDConsulta" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PresSvcRq']/*[local-name()='RqUID']"/>
+                            <xsl:variable name="rqUIDConsulta" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRs']/*[local-name()='RqUID']"/>
 
-                            <!-- tag ruta codigos respuesta cliente-->
-                            <xsl:variable name="StatusCodeResponse" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PresSvcRs']/*[local-name()='BilllnqRs']/*[local-name()='Status']/*[local-name()='StatusCode']"/>
+                            <!-- tag ruta homologar codigos respuesta-->
+                            <xsl:variable name="StatusCodeResponse" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRs']/*[local-name()='PmtAddRs']/*[local-name()='Status']/*[local-name()='StatusCode']"/>
                             
+                            <xsl:variable name="StatusDescResponse" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRs']/*[local-name()='PmtAddRs']/*[local-name()='Status']/*[local-name()='severity']"/>
+
                             <!-- tag homologar descripcion javerianacali-->
-                            <xsl:variable name="StatusDescResponse" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PresSvcRs']/*[local-name()='BilllnqRs']/*[local-name()='Status']/*[local-name()='StatusDesc']"/>
+                            <xsl:variable name="StatusDescResponse" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRs']/*[local-name()='PmtAddRs']/*[local-name()='Status']/*[local-name()='StatusDesc']"/>
                             
-                            <!-- generar el tag para la peticion 2-->
-                            <xsl:variable name="RqUIDResponse" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PresSvcRq']/*[local-name()='BilllnqRs']/*[local-name()='RqUID']"/>
-                            
+
                             <!-- generar el tag para la peticion 3-->
-                            <xsl:variable name="BillResponse" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PresSvcRq']/*[local-name()='BilllnqRs']/*[local-name()='BillRec']/*[local-name()='Billld']"/>
+                            <xsl:variable name="BillResponse" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRs']/*[local-name()='PmtAddRs']/*[local-name()='RqUID']"/>
+
+                            
+                            <xsl:variable name="billIdPago" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRs']/*[local-name()='PmtAddRs']/*[local-name()='PmtInfo']/*[local-name()='RemitInfo']/*[local-name()='BillId']"/>
+
+                            <xsl:variable name="amtPagoRequest" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRq']/*[local-name()='PmtAddRs']/*[local-name()='PmtInfo']/*[local-name()='RemitInfo']/*[local-name()='CurAmt']/*[local-name()='Amt']"/>
+
+
+                           <xsl:variable name="billIdPago" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRs']/*[local-name()='PmtAddRs']/*[local-name()='PmtInfo']/*[local-name()='DepAccIdFrom']/*[local-name()='AcctId']"/> 
+
+                             <xsl:variable name="billIdPago" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRs']/*[local-name()='PmtAddRs']/*[local-name()='PmtInfo']/*[local-name()='DepAccIdFrom']/*[local-name()='BannkInfo']"/>
+
+                             
+                            <xsl:variable name="BillResponse" select="$srtIFXRq/*[local-name()='IFX']/*[local-name()='PaySvcRs']/*[local-name()='PmtAddRs']/*[local-name()='AsyncRqUID']"/>>
                             
                             
                             <xsl:variable name="varIFX">
@@ -564,7 +579,7 @@
                                                         </BillId>
                                                         <CurAmt>
                                                             <Amt>
-                                                                <xsl:value-of select="$amtPagoRequest2"/>
+                                                                <xsl:value-of select="$amtPagoRequest"/>
                                                             </Amt>
                                                         </CurAmt>
                                                     </RemitInfo>
