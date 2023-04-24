@@ -11,6 +11,6 @@
     <cifradoReponse/>
     <wsdl>local:///WSP_RIN_JAVERIANACALI/wsdl/WSP_RIN_JAVERIANACALI.wsdl</wsdl>
     <basicAuthorization>false</basicAuthorization>
-    <soapUsernamePassword>false</soapUsernamePassword>
+    <soapUsernamePassword>true</soapUsernamePassword>
     <usernameTokenWSSecurity>false</usernameTokenWSSecurity>
 </servicio>
